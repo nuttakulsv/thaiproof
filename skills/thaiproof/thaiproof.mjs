@@ -75,6 +75,10 @@ const STYLE = [
 const QUESTION_KA = new RegExp("(ไหม|มั้ย|มั๊ย|หรือเปล่า|หรือยัง|หรือไม่|อะไร|ที่ไหน|เมื่อไร|เมื่อไหร่|ยังไง|อย่างไร|ทำไม|เท่าไร|เท่าไหร่|ใคร)\\s*ค่ะ", "g")
 const STATEMENT_KA = new RegExp("(ขอบคุณ|สวัสดี|ยินดี|ได้เลย|เรียบร้อยแล้ว|เรียบร้อย|รับทราบ|ขอโทษ|ไม่เป็นไร)\\s*คะ(?![" + THAI + "])", "g")
 
+const MONTHS = "ม.ค.|ก.พ.|มี.ค.|เม.ย.|พ.ค.|มิ.ย.|ก.ค.|ส.ค.|ก.ย.|ต.ค.|พ.ย.|ธ.ค.|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน" +
+  "|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม"
+const BE_LABEL = new RegExp("(พ\\.ศ\\.|B\\.?E\\.?|" + MONTHS.replace(/\./g, "\\.") + ")\\s*$")
+
 const compile = (rows, level, rule, message) =>
   rows.map(([wrong, right]) => ({ re: new RegExp(wrong, "g"), level, rule, fix: right, message }))
 const WORD_RULES = [
@@ -144,8 +148,11 @@ export function lint(text, { royin = true, hints = true } = {}) {
     doc("คำที่ AI ชอบใช้", new RegExp("[" + THAI + "]\\s*!", "g"), 3, (n) => `ใช้ ! ${n} ครั้ง ลองลดลง`)
     if (/ครับ/.test(src) && new RegExp("ค่ะ|คะ(?![" + THAI + "])").test(src))
       doc("ระดับภาษา", /ครับ/g, 1, () => "มีทั้ง \"ครับ\" และ \"ค่ะ/คะ\" ในข้อความเดียว เลือกแบบเดียว (ยกเว้นเป็นบทสนทนา)")
-    if (/\b25\d\d\b/.test(src) && /\b(19|20)\d\d\b/.test(src) && !/พ\.ศ\.|ค\.ศ\./.test(src))
-      doc("ตัวเลข", /\b25\d\d\b/g, 1, () => "มีทั้งปี พ.ศ. และ ค.ศ. ระบุให้ชัดว่าเป็น พ.ศ. หรือ ค.ศ.")
+    // a Buddhist-era year is labelled when it follows a Thai month or B.E., or is paired like "2548 (2005)"
+    const unlabelled = [...src.matchAll(/\b25\d\d\b/g)].filter((m) =>
+      !BE_LABEL.test(src.slice(Math.max(0, m.index - 14), m.index)) && !/^\s*\((19|20)\d\d\)/.test(src.slice(m.index + 4, m.index + 12)))
+    if (unlabelled.length && /\b(19|20)\d\d\b/.test(src) && !/พ\.ศ\.|ค\.ศ\./.test(src))
+      push(HINT, "ตัวเลข", unlabelled[0].index, unlabelled[0][0], null, "มีทั้งปี พ.ศ. และ ค.ศ. ระบุให้ชัดว่าเป็น พ.ศ. หรือ ค.ศ.")
   }
 
   const order = { error: 0, warning: 1, hint: 2 }

@@ -59,6 +59,9 @@ test("style hints and the AI score", () => {
     assert.ok(lint(ai).problems.some((p) => p.found.startsWith(rule)), rule)
   assert.ok(found("ใช้ได้เลย  ไม่ต้องตั้งค่า").includes("เว้นวรรค:  -> "))
   assert.ok(found("ทักครับ ส่วนเราตอบค่ะ").some((x) => x.startsWith("ระดับภาษา")))
+  assert.ok(found("ออกปี 2569 ส่วนอีกรุ่นออกปี 2026").some((x) => x.startsWith("ตัวเลข")))
+  for (const ok of ["เช็คแล้ว ณ วันที่ 1 พ.ย. 2569 ตาม ISO 2017", "บัตรรุ่น 2548 (2005) ใช้ถึงปี 2026", "B.E. 2530 was 1987"])
+    assert.ok(!found(ok).some((x) => x.startsWith("ตัวเลข")), ok)
 })
 
 test("command line: reads stdin, exits 1 on errors", () => {
