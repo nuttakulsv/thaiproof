@@ -1,0 +1,12 @@
+{
+  "name": "thaiproof",
+  "owner": { "name": "nuttakulsv" },
+  "description": "เขียนภาษาไทยให้เหมือนคนไทยเขียน: skill และตัวตรวจภาษาไทยสำหรับ coding agent",
+  "plugins": [
+    {
+      "name": "thaiproof",
+      "source": "./",
+      "description": "Makes coding agents write Thai like a Thai person: no translationese, no AI marketing words, Royal Institute spelling, correct คะ/ค่ะ. Includes a checker for misspellings, loanwords and AI-style phrasing."
+    }
+  ]
+}

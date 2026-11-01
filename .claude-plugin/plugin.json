@@ -1,0 +1,9 @@
+{
+  "name": "thaiproof",
+  "version": "0.1.0",
+  "description": "Makes coding agents write Thai like a Thai person: no translationese, no AI marketing words, Royal Institute spelling, correct คะ/ค่ะ. Includes a checker for misspellings, loanwords and AI-style phrasing.",
+  "author": { "name": "nuttakulsv" },
+  "homepage": "https://github.com/nuttakulsv/thaiproof",
+  "license": "MIT",
+  "keywords": ["thai", "ภาษาไทย", "proofreading", "spell-check", "writing", "linter", "localization"]
+}
